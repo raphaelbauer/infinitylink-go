@@ -3,14 +3,13 @@ package waybackmachine
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 
 	"infinitylink-go/httpmockable"
 )
 
 type Waybackmachine interface {
-	CheckIfUrlExists(url string) bool
-	CheckIfUrlExistsOnWaybackmachine(url string) (bool, string)
+	CheckIfUrlExists(url string) (error, bool)
+	CheckIfUrlExistsOnWaybackmachine(url string) (error, bool, string)
 	SaveUrlOnWaybackMachine(url string)
 }
 
@@ -18,17 +17,17 @@ type WaybackmachineReal struct {
 	Httpmockable httpmockable.HttpMockable
 }
 
-func (waybackmachineReal *WaybackmachineReal) CheckIfUrlExists(url string) bool {
+func (waybackmachineReal *WaybackmachineReal) CheckIfUrlExists(url string) (error, bool) {
 	res, err := waybackmachineReal.Httpmockable.Get(url)
 
 	if err != nil {
-		return false
+		return err, false
 	}
 
 	if res.StatusCode >= 200 && res.StatusCode < 300 {
-		return true
+		return nil, true
 	} else {
-		return false
+		return nil, false
 	}
 }
 
@@ -60,25 +59,25 @@ type WaybackMachineResponseSingle struct {
 }
 
 // ///////////////////////////////////////////////////////////////////////////
-func (waybackmachineReal *WaybackmachineReal) CheckIfUrlExistsOnWaybackmachine(url string) (bool, string) {
+func (waybackmachineReal *WaybackmachineReal) CheckIfUrlExistsOnWaybackmachine(url string) (error, bool, string) {
 	res, err := waybackmachineReal.Httpmockable.Get("http://archive.org/wayback/available?url=" + url)
 	if err != nil {
-		log.Fatal(err)
+		return err, false, ""
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		log.Println(readErr)
+		return err, false, ""
 	}
 
 	waybackMachineResponseEnvelope := WaybackMachineResponseEnvelope{}
 	jsonErr := json.Unmarshal(body, &waybackMachineResponseEnvelope)
 
 	if jsonErr != nil {
-		log.Println(jsonErr)
+		return err, false, ""
 	}
 
-	return waybackMachineResponseEnvelope.Archived_snapshots.Closest.Available, waybackMachineResponseEnvelope.Archived_snapshots.Closest.Url
+	return nil, waybackMachineResponseEnvelope.Archived_snapshots.Closest.Available, waybackMachineResponseEnvelope.Archived_snapshots.Closest.Url
 }
 
 func (waybackmachineReal *WaybackmachineReal) SaveUrlOnWaybackMachine(url string) {

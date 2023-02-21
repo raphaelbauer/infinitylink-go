@@ -24,14 +24,14 @@ type WaybackmachineMock struct {
 	saveUrlOnWaybackMachineCalled int
 }
 
-func (w *WaybackmachineMock) CheckIfUrlExists(url string) bool {
+func (w *WaybackmachineMock) CheckIfUrlExists(url string) (error, bool) {
 	w.checkIfUrlExistsCalled++
-	return w.checkIfUrlExistsReturn
+	return nil, w.checkIfUrlExistsReturn
 }
 
-func (w *WaybackmachineMock) CheckIfUrlExistsOnWaybackmachine(url string) (bool, string) {
+func (w *WaybackmachineMock) CheckIfUrlExistsOnWaybackmachine(url string) (error, bool, string) {
 	w.checkIfUrlExistsOnWaybackmachineCalled++
-	return w.checkIfUrlExistsOnWaybackmachineReturn1, w.checkIfUrlExistsOnWaybackmachineReturn2
+	return nil, w.checkIfUrlExistsOnWaybackmachineReturn1, w.checkIfUrlExistsOnWaybackmachineReturn2
 }
 func (w *WaybackmachineMock) SaveUrlOnWaybackMachine(url string) {
 	w.saveUrlOnWaybackMachineCalled++

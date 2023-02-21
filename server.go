@@ -44,20 +44,34 @@ func (serverMachineImpl *ServerMachineImpl) Server(w http.ResponseWriter, r *htt
 
 	url := strings.TrimPrefix(r.URL.Path, "/")
 
-	if serverMachineImpl.Waybackmachine.CheckIfUrlExists(url) {
+	urlExistsError, urlExists := serverMachineImpl.Waybackmachine.CheckIfUrlExists(url)
+	if urlExistsError != nil {
+		log.Fatal(urlExistsError)
+		http.Error(w, "opsi", http.StatusInternalServerError)
+		return
+	}
+
+	if urlExists {
 		// calling this every time is overkill and a waste - but we don't have a db yet...
 		// this is not high traffic after all...
 		serverMachineImpl.Waybackmachine.SaveUrlOnWaybackMachine(url)
 		http.Redirect(w, r, url, http.StatusSeeOther)
-	} else {
-		exists, waybackMachineUrl := serverMachineImpl.Waybackmachine.CheckIfUrlExistsOnWaybackmachine(url)
-
-		if exists {
-			http.Redirect(w, r, waybackMachineUrl, http.StatusSeeOther)
-
-		} else {
-			// url does not exist AND does not exist on waybackmachine... arg...
-			http.NotFound(w, r)
-		}
+		return
 	}
+
+	waybackMachineUrlError, waybackMachineUrlExists, waybackMachineUrl := serverMachineImpl.Waybackmachine.CheckIfUrlExistsOnWaybackmachine(url)
+	if waybackMachineUrlError != nil {
+		log.Fatal(waybackMachineUrlError)
+		http.Error(w, "opsi", http.StatusInternalServerError)
+		return
+	}
+
+	if waybackMachineUrlExists {
+		http.Redirect(w, r, waybackMachineUrl, http.StatusSeeOther)
+		return
+	}
+
+	// url does not exist AND does not exist on waybackmachine... arg...
+	http.NotFound(w, r)
+
 }

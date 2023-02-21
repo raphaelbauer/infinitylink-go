@@ -1,6 +1,7 @@
 package hamcrest
 
 import (
+	"reflect"
 	"strings"
 )
 
@@ -24,40 +25,8 @@ type ExpectResult struct {
 func (e *ExpectResult) ToEqual(want any) {
 	e.t.Helper()
 
-	handled := false
-
-	{
-		gotString, gotIsString := e.Got.(string)
-		if gotIsString {
-			handled = true
-			if gotString != want {
-				e.t.Errorf("got %q, want %q", gotString, want)
-			}
-		}
-	}
-
-	{
-		gotInt, isInt := e.Got.(int)
-		if isInt {
-			handled = true
-			if gotInt != want {
-				e.t.Errorf("got %d, want %d", gotInt, want)
-			}
-		}
-	}
-
-	{
-		gotBool, gotIsBool := e.Got.(bool)
-		if gotIsBool {
-			handled = true
-			if gotBool != want {
-				e.t.Errorf("got %t, want %t", gotBool, want)
-			}
-		}
-	}
-
-	if !handled {
-		e.t.Errorf("matcher for ToEqual was not implemented. Consider implementing it.")
+	if !reflect.DeepEqual(e.Got, want) {
+		e.t.Errorf("got %t, want %t", e.Got, want)
 	}
 
 }

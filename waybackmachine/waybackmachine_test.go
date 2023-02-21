@@ -53,9 +53,10 @@ func TestServerImpl(t *testing.T) {
 		waybackmachineReal := WaybackmachineReal{&httpMock}
 
 		// when
-		var exists, url = waybackmachineReal.CheckIfUrlExistsOnWaybackmachine("http://myurl.com")
+		var error, exists, url = waybackmachineReal.CheckIfUrlExistsOnWaybackmachine("http://myurl.com")
 
 		// then
+		Expect(error, t).ToEqual(nil)
 		Expect(exists, t).ToEqual(true)
 		Expect(url, t).ToEqual("http://web.archive.org/web/20130919044612/http://example.com/")
 	})
@@ -78,9 +79,10 @@ func TestServerImpl(t *testing.T) {
 		waybackmachineReal := WaybackmachineReal{&httpMock}
 
 		// when
-		var exists, url = waybackmachineReal.CheckIfUrlExistsOnWaybackmachine("http://myurl.com")
+		var error, exists, url = waybackmachineReal.CheckIfUrlExistsOnWaybackmachine("http://myurl.com")
 
 		// then
+		Expect(error, t).ToEqual(nil)
 		Expect(exists, t).ToEqual(false)
 		Expect(url, t).ToEqual("")
 	})
@@ -95,9 +97,10 @@ func TestServerImpl(t *testing.T) {
 		waybackmachineReal := WaybackmachineReal{&httpMock}
 
 		// when
-		var exists = waybackmachineReal.CheckIfUrlExists("http://myurl.com")
+		var error, exists = waybackmachineReal.CheckIfUrlExists("http://myurl.com")
 
 		// then
+		Expect(error, t).ToEqual(nil)
 		Expect(exists, t).ToEqual(true)
 	})
 
@@ -111,9 +114,10 @@ func TestServerImpl(t *testing.T) {
 		waybackmachineReal := WaybackmachineReal{&httpMock}
 
 		// when
-		var exists = waybackmachineReal.CheckIfUrlExists("http://myurl.com")
+		var error, exists = waybackmachineReal.CheckIfUrlExists("http://myurl.com")
 
 		// then
+		Expect(error, t).ToEqual(nil)
 		Expect(exists, t).ToEqual(false)
 	})
 

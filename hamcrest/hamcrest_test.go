@@ -1,6 +1,7 @@
 package hamcrest
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -31,11 +32,12 @@ func TestHamcrest(t *testing.T) {
 		}
 	})
 
-	t.Run("ToEquals works for string", func(t *testing.T) {
+	t.Run("ToEquals works", func(t *testing.T) {
 		// positive tests
 		Expect("test", t).ToEqual("test")
 		Expect(true, t).ToEqual(true)
 		Expect(false, t).ToEqual(false)
+		Expect(errors.New("error"), t).ToEqual(errors.New("error"))
 
 		// Negative tests. Can't use t here... mocking t otherwise the test would fail
 		// as we expect failure
